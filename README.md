@@ -4,9 +4,6 @@
 
 **🎮 獨立遊戲開發者 | 來自台灣 🇹🇼**
 
-[![GitHub followers](https://img.shields.io/github/followers/torihiplay?style=social)](https://github.com/torihiplay)
-[![GitHub stars](https://img.shields.io/github/stars/torihiplay?style=social)](https://github.com/torihiplay)
-
 </div>
 
 ---
@@ -69,25 +66,13 @@
 ## 🛠️ 技術棧
 
 ```
-Swift | iOS Development | Xcode | Git | Game Design
+Unity | iOS Development | Xcode | Pixel Art | Game Design
 ```
-
----
-
-## 📊 GitHub 活動
-
-<div align="center">
-
-[![GitHub Streak](https://github-readme-streak-stats.herokuapp.com/?user=torihiplay&theme=tokyonight&hide_border=true)](https://github.com/torihiplay)
-
-</div>
-
----
 
 ## 🔗 聯繫方式
 
 <p align="center">
-  <a href="https://torihiplay.github.io/hopisland/">🌐 官方網站</a>
+  <a href="https://torihiplay.github.io/Torihiplay/">🌐 官方網站</a>
 </p>
 
 ---
@@ -110,8 +95,6 @@ Swift | iOS Development | Xcode | Git | Game Design
 
 <div align="center">
 
-[![點讚](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Ftorihiplay%2Ftorihiplay&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=👍+讚&edge_flat=false)](https://github.com/torihiplay)
-
 **感謝每一位支持者！** 🎉
 
 </div>
@@ -120,14 +103,14 @@ Swift | iOS Development | Xcode | Git | Game Design
 
 <div align="center">
 
-### 💭 開發者的話
+## 💭 開發者的話
 
-*"好的遊戲不需要複雜的機制，只需要能讓玩家會心一笑的瞬間。"*
+"不用解釋，去感受它。"
 
 ---
 
-⭐ **如果你喜歡我的遊戲，歡迎給個星星！**
+⭐ 如果你喜歡我的遊戲，歡迎給個星星！
 
-**© 2024 Torihiplay | Made with ❤️ in Taiwan**
+© 2024 Torihiplay | Made with ❤️ in Taiwan
 
 </div>
