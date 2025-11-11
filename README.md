@@ -2,7 +2,7 @@
 
 <div align="center">
 
-**🎮 獨立遊戲開發者 | 來自台灣 🇹🇼**
+🎮 獨立遊戲開發者 | 來自台灣 🇹🇼
 
 </div>
 
@@ -95,7 +95,7 @@ Unity | iOS Development | Xcode | Pixel Art | Game Design
 
 <div align="center">
 
-**感謝每一位支持者！** 🎉
+感謝每一位支持者！ 🎉
 
 </div>
 
@@ -103,7 +103,7 @@ Unity | iOS Development | Xcode | Pixel Art | Game Design
 
 <div align="center">
 
-## 💭 開發者的話
+ 💭 開發者的話
 
 "不用解釋，去感受它。"
 
