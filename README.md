@@ -249,8 +249,6 @@
         }
 
         .wood {
-            width: 80px;
-            height: 25px;
             background: linear-gradient(135deg, #8b4513 0%, #a0522d 50%, #8b4513 100%);
             border-radius: 12px;
             cursor: pointer;
@@ -258,6 +256,21 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
             position: relative;
             border: 2px solid #654321;
+        }
+
+        .wood.small {
+            width: 60px;
+            height: 20px;
+        }
+
+        .wood.medium {
+            width: 80px;
+            height: 25px;
+        }
+
+        .wood.large {
+            width: 100px;
+            height: 30px;
         }
 
         .wood::before {
@@ -444,9 +457,9 @@
                 🔥 已投入 <span id="woodCount">0</span> 根木頭
             </div>
             <div class="wood-pile">
-                <div class="wood" onclick="throwWood(this)"></div>
-                <div class="wood" onclick="throwWood(this)"></div>
-                <div class="wood" onclick="throwWood(this)"></div>
+                <div class="wood small" onclick="throwWood(this, 1)"></div>
+                <div class="wood medium" onclick="throwWood(this, 1.5)"></div>
+                <div class="wood large" onclick="throwWood(this, 2)"></div>
             </div>
             <p style="margin-top: 20px; color: #ffa07a;">讓我們一起讓這把火燒得更旺！ 🔥</p>
         </div>
@@ -493,16 +506,58 @@
                 const alpha = this.life / this.maxLife;
                 const lifeRatio = this.life / this.maxLife;
                 
-                // 顏色從紅色到橙色到黃色
+                // 根據火焰強度改變顏色
                 let r, g, b;
-                if (lifeRatio > 0.6) {
-                    r = 255;
-                    g = Math.floor(100 + (lifeRatio - 0.6) * 387);
-                    b = 0;
+                
+                // 當火焰很旺時（強度>2），加入藍色/白色
+                if (fireIntensity > 2.5) {
+                    // 超高溫 - 藍白火焰
+                    if (lifeRatio > 0.7) {
+                        r = 200 + Math.floor(55 * lifeRatio);
+                        g = 220 + Math.floor(35 * lifeRatio);
+                        b = Math.floor(255 * (fireIntensity - 2.5) / 1.5);
+                    } else if (lifeRatio > 0.5) {
+                        r = 255;
+                        g = 255;
+                        b = Math.floor(200 * (fireIntensity - 2.5) / 1.5);
+                    } else {
+                        r = 255;
+                        g = Math.floor(150 + lifeRatio * 105);
+                        b = 0;
+                    }
+                } else if (fireIntensity > 2) {
+                    // 高溫 - 白黃火焰
+                    if (lifeRatio > 0.6) {
+                        r = 255;
+                        g = Math.floor(200 + (lifeRatio - 0.6) * 137);
+                        b = Math.floor(100 * (fireIntensity - 2) / 0.5);
+                    } else {
+                        r = 255;
+                        g = Math.floor(150 + lifeRatio * 105);
+                        b = 0;
+                    }
+                } else if (fireIntensity > 1.5) {
+                    // 中高溫 - 橙黃火焰
+                    if (lifeRatio > 0.6) {
+                        r = 255;
+                        g = Math.floor(180 + (lifeRatio - 0.6) * 187);
+                        b = 0;
+                    } else {
+                        r = 255;
+                        g = Math.floor(120 + lifeRatio * 135);
+                        b = 0;
+                    }
                 } else {
-                    r = 255;
-                    g = Math.floor(69 + lifeRatio * 150);
-                    b = 0;
+                    // 正常溫度 - 紅橙火焰
+                    if (lifeRatio > 0.6) {
+                        r = 255;
+                        g = Math.floor(100 + (lifeRatio - 0.6) * 387);
+                        b = 0;
+                    } else {
+                        r = 255;
+                        g = Math.floor(69 + lifeRatio * 150);
+                        b = 0;
+                    }
                 }
 
                 ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
@@ -510,9 +565,11 @@
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
                 ctx.fill();
 
-                // 內核發光效果
+                // 內核發光效果 - 根據強度調整
                 if (lifeRatio > 0.5) {
-                    ctx.fillStyle = `rgba(255, 255, 150, ${alpha * 0.5})`;
+                    const coreIntensity = fireIntensity > 2 ? 0.8 : 0.5;
+                    const coreColor = fireIntensity > 2.5 ? '200, 220, 255' : '255, 255, 150';
+                    ctx.fillStyle = `rgba(${coreColor}, ${alpha * coreIntensity})`;
                     ctx.beginPath();
                     ctx.arc(this.x, this.y, this.size * 0.5, 0, Math.PI * 2);
                     ctx.fill();
@@ -553,15 +610,15 @@
             requestAnimationFrame(animate);
         }
 
-        function boostFire() {
-            fireIntensity = Math.min(fireIntensity + 1.5, 4);
+        function boostFire(multiplier = 1.5) {
+            fireIntensity = Math.min(fireIntensity + multiplier, 4);
         }
 
-        function showPlusOne() {
+        function showPlusOne(size) {
             const section = document.querySelector('.like-section');
             const plusOne = document.createElement('div');
             plusOne.className = 'plus-one';
-            plusOne.textContent = '+1';
+            plusOne.textContent = '+' + Math.round(size);
             plusOne.style.left = `${canvas.offsetLeft + canvas.width / 2 - 20}px`;
             plusOne.style.top = `${canvas.offsetTop + 50}px`;
             section.appendChild(plusOne);
@@ -569,7 +626,7 @@
             setTimeout(() => plusOne.remove(), 1000);
         }
 
-        function throwWood(woodElement) {
+        function throwWood(woodElement, multiplier = 1.5) {
             // 增加計數
             woodCount++;
             document.getElementById('woodCount').textContent = woodCount;
@@ -585,7 +642,7 @@
             
             const startX = rect.left;
             const startY = rect.top;
-            const endX = canvasRect.left + canvasRect.width / 2 - 40;
+            const endX = canvasRect.left + canvasRect.width / 2 - rect.width / 2;
             const endY = canvasRect.top + canvasRect.height / 2;
 
             wood.style.left = startX + 'px';
@@ -613,8 +670,8 @@
                     requestAnimationFrame(animateThrow);
                 } else {
                     wood.remove();
-                    boostFire();
-                    showPlusOne();
+                    boostFire(multiplier);
+                    showPlusOne(multiplier);
                 }
             }
 
