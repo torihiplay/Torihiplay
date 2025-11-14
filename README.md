@@ -335,7 +335,7 @@
             <h3>1️⃣ DinoKite 🦖</h3>
             <h4>帶領小恐龍完成風箏夢想的可愛遊戲</h4>
             <p>經典的跑酷遊戲玩法，簡單卻令人上癮！控制可愛的小恐龍跳躍障礙物，挑戰你的反應速度和高分記錄。</p>
-            <a href="https://apps.apple.com/tw/app/dinokite/id6741765563" target="_blank">📱 前往 App Store 下載</a>
+            <a href="https://apps.apple.com/tw/app/dinokite/id6741765553" target="_blank">📱 前往 App Store 下載</a>
         </div>
 
         <div class="game-card rolling">
