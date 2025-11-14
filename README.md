@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
@@ -220,57 +221,96 @@
 
         .like-section {
             text-align: center;
-            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+            background: linear-gradient(135deg, #2c1810 0%, #1a0f08 100%);
             padding: 40px;
             border-radius: 16px;
             margin: 40px 0;
-        }
-
-        .like-button {
-            background: white;
-            border: none;
-            padding: 20px 40px;
-            border-radius: 50px;
-            font-size: 2em;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .like-button:hover {
-            transform: scale(1.1);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-        }
-
-        .like-button:active {
-            transform: scale(0.95);
-        }
-
-        .like-button.liked {
-            background: #ff6b6b;
-            color: white;
-            animation: pulse 0.3s ease;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-        }
-
-        .like-count {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #2d3748;
-            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
         }
 
         .like-section p {
-            margin-top: 15px;
             font-size: 1.2em;
-            color: #2d3748;
+            color: #ffa07a;
+            margin-bottom: 20px;
+        }
+
+        #fireCanvas {
+            display: block;
+            margin: 20px auto;
+            border-radius: 10px;
+        }
+
+        .wood-pile {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .wood {
+            width: 80px;
+            height: 25px;
+            background: linear-gradient(135deg, #8b4513 0%, #a0522d 50%, #8b4513 100%);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            position: relative;
+            border: 2px solid #654321;
+        }
+
+        .wood::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: #654321;
+            opacity: 0.5;
+        }
+
+        .wood:hover {
+            transform: scale(1.1);
+        }
+
+        .wood:active {
+            transform: scale(0.95);
+        }
+
+        .wood.throwing {
+            position: fixed;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .plus-one {
+            position: absolute;
+            font-size: 2em;
+            font-weight: bold;
+            color: #ff6347;
+            text-shadow: 0 0 10px #ff6347;
+            pointer-events: none;
+            animation: floatUp 1s ease-out forwards;
+        }
+
+        @keyframes floatUp {
+            0% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-80px);
+            }
+        }
+
+        .fire-count {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #ffa07a;
+            margin-top: 20px;
         }
 
         .footer {
@@ -396,17 +436,19 @@
 
         <hr>
 
-        <h2>👍 給我一個讚！</h2>
+        <h2>🔥 添柴加火！</h2>
         <div class="like-section">
-            <p>如果你喜歡我的遊戲和專案，點擊下方按鈕給我一個讚吧！</p>
-            <button class="like-button" id="likeBtn">
-                <span id="likeIcon">👍</span>
-                <span>按讚</span>
-            </button>
-            <div class="like-count">
-                <span id="likeCount">0</span> 個讚
+            <p>點擊下方的木頭投入火堆，讓火焰燒得更旺！</p>
+            <canvas id="fireCanvas" width="300" height="200"></canvas>
+            <div class="fire-count">
+                🔥 已投入 <span id="woodCount">0</span> 根木頭
             </div>
-            <p style="margin-top: 20px;">感謝每一位支持者！ 🎉</p>
+            <div class="wood-pile">
+                <div class="wood" onclick="throwWood(this)"></div>
+                <div class="wood" onclick="throwWood(this)"></div>
+                <div class="wood" onclick="throwWood(this)"></div>
+            </div>
+            <p style="margin-top: 20px; color: #ffa07a;">讓我們一起讓這把火燒得更旺！ 🔥</p>
         </div>
 
         <hr>
@@ -421,40 +463,166 @@
     </div>
 
     <script>
-        let likeCount = 0;
-        let hasLiked = false;
+        // 火焰系統
+        const canvas = document.getElementById('fireCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let fireIntensity = 1;
+        let woodCount = 0;
 
-        // 從 localStorage 讀取讚數
-        if (localStorage.getItem('torihiplay_likes')) {
-            likeCount = parseInt(localStorage.getItem('torihiplay_likes'));
-            document.getElementById('likeCount').textContent = likeCount;
-        }
-
-        // 檢查用戶是否已經按過讚
-        if (localStorage.getItem('torihiplay_user_liked') === 'true') {
-            hasLiked = true;
-            document.getElementById('likeBtn').classList.add('liked');
-            document.getElementById('likeIcon').textContent = '❤️';
-        }
-
-        document.getElementById('likeBtn').addEventListener('click', function() {
-            if (!hasLiked) {
-                likeCount++;
-                hasLiked = true;
-                this.classList.add('liked');
-                document.getElementById('likeIcon').textContent = '❤️';
-                localStorage.setItem('torihiplay_likes', likeCount);
-                localStorage.setItem('torihiplay_user_liked', 'true');
-            } else {
-                likeCount--;
-                hasLiked = false;
-                this.classList.remove('liked');
-                document.getElementById('likeIcon').textContent = '👍';
-                localStorage.setItem('torihiplay_likes', likeCount);
-                localStorage.setItem('torihiplay_user_liked', 'false');
+        class FireParticle {
+            constructor(x, y, intensity = 1) {
+                this.x = x;
+                this.y = y;
+                this.vx = (Math.random() - 0.5) * 2 * intensity;
+                this.vy = -Math.random() * 3 * intensity - 1;
+                this.life = Math.random() * 60 + 40;
+                this.maxLife = this.life;
+                this.size = Math.random() * 8 * intensity + 2;
             }
-            document.getElementById('likeCount').textContent = likeCount;
-        });
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vy -= 0.1;
+                this.life--;
+                this.size *= 0.97;
+            }
+
+            draw() {
+                const alpha = this.life / this.maxLife;
+                const lifeRatio = this.life / this.maxLife;
+                
+                // 顏色從紅色到橙色到黃色
+                let r, g, b;
+                if (lifeRatio > 0.6) {
+                    r = 255;
+                    g = Math.floor(100 + (lifeRatio - 0.6) * 387);
+                    b = 0;
+                } else {
+                    r = 255;
+                    g = Math.floor(69 + lifeRatio * 150);
+                    b = 0;
+                }
+
+                ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+
+                // 內核發光效果
+                if (lifeRatio > 0.5) {
+                    ctx.fillStyle = `rgba(255, 255, 150, ${alpha * 0.5})`;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size * 0.5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            isDead() {
+                return this.life <= 0;
+            }
+        }
+
+        function createFireParticles() {
+            const particlesPerFrame = Math.floor(5 * fireIntensity);
+            for (let i = 0; i < particlesPerFrame; i++) {
+                const x = canvas.width / 2 + (Math.random() - 0.5) * 60;
+                const y = canvas.height - 20;
+                particles.push(new FireParticle(x, y, fireIntensity));
+            }
+        }
+
+        function animate() {
+            ctx.fillStyle = 'rgba(44, 24, 16, 0.3)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            createFireParticles();
+
+            particles = particles.filter(p => !p.isDead());
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+
+            // 火焰強度慢慢衰減
+            if (fireIntensity > 1) {
+                fireIntensity *= 0.99;
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        function boostFire() {
+            fireIntensity = Math.min(fireIntensity + 1.5, 4);
+        }
+
+        function showPlusOne() {
+            const section = document.querySelector('.like-section');
+            const plusOne = document.createElement('div');
+            plusOne.className = 'plus-one';
+            plusOne.textContent = '+1';
+            plusOne.style.left = `${canvas.offsetLeft + canvas.width / 2 - 20}px`;
+            plusOne.style.top = `${canvas.offsetTop + 50}px`;
+            section.appendChild(plusOne);
+
+            setTimeout(() => plusOne.remove(), 1000);
+        }
+
+        function throwWood(woodElement) {
+            // 增加計數
+            woodCount++;
+            document.getElementById('woodCount').textContent = woodCount;
+
+            // 複製木頭用於動畫
+            const wood = woodElement.cloneNode(true);
+            wood.classList.add('throwing');
+            document.body.appendChild(wood);
+
+            // 獲取起始和目標位置
+            const rect = woodElement.getBoundingClientRect();
+            const canvasRect = canvas.getBoundingClientRect();
+            
+            const startX = rect.left;
+            const startY = rect.top;
+            const endX = canvasRect.left + canvasRect.width / 2 - 40;
+            const endY = canvasRect.top + canvasRect.height / 2;
+
+            wood.style.left = startX + 'px';
+            wood.style.top = startY + 'px';
+
+            // 拋物線動畫
+            const duration = 800;
+            const startTime = Date.now();
+
+            function animateThrow() {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+
+                // 使用二次貝塞爾曲線模擬拋物線
+                const controlY = startY - 150;
+                const t = progress;
+                const x = startX + (endX - startX) * t;
+                const y = (1 - t) * (1 - t) * startY + 2 * (1 - t) * t * controlY + t * t * endY;
+
+                wood.style.left = x + 'px';
+                wood.style.top = y + 'px';
+                wood.style.transform = `rotate(${progress * 720}deg)`;
+
+                if (progress < 1) {
+                    requestAnimationFrame(animateThrow);
+                } else {
+                    wood.remove();
+                    boostFire();
+                    showPlusOne();
+                }
+            }
+
+            animateThrow();
+        }
+
+        // 開始動畫
+        animate();
     </script>
 </body>
 </html>
